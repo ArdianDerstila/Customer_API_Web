@@ -37,7 +37,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Customer Image API v1");
     c.RoutePrefix = string.Empty; // Swagger at root URL
 });
-
+//app.UseMiddleware<SimpleAuthMiddleware>();
 // Basic pipeline
 app.UseCors();
 app.MapControllers();
