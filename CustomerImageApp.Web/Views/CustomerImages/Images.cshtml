@@ -1,0 +1,381 @@
+﻿@model CustomerImageApp.Web.Models.CustomerImagesViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@Model.CustomerName - Images</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+            .header h1 {
+                font-size: 24px;
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            .header p {
+                color: #666;
+                font-size: 14px;
+            }
+
+        .nav-links {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .nav-link {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            margin: 0 5px;
+        }
+
+            .nav-link:hover {
+                background: #0056b3;
+                text-decoration: none;
+                color: white;
+            }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .card-header h3 {
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+
+            .upload-area:hover {
+                border-color: #007bff;
+            }
+
+            .upload-area.disabled {
+                background: #f8f9fa;
+                border-color: #ffc107;
+            }
+
+        .file-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin: 15px 0;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+            .btn:hover {
+                background: #0056b3;
+            }
+
+        .btn-danger {
+            background: #dc3545;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+            .btn-danger:hover {
+                background: #c82333;
+            }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .image-item {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+
+            .image-item:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+
+            .image-item img {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+            }
+
+        .image-details {
+            padding: 15px;
+        }
+
+        .image-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        .image-date {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #007bff;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .counter {
+            color: #007bff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+            .empty-state h4 {
+                font-size: 18px;
+                margin-bottom: 10px;
+                font-weight: 500;
+            }
+
+        .small-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>@Model.CustomerName</h1>
+            <p>Customer #@Model.CustomerId • Image Management</p>
+
+            <div class="nav-links">
+                <a href="@Url.Action("List", "Customers")" class="nav-link">← All Customers</a>
+                <a href="@Url.Action("Images", "Customers", new { id = Model.CustomerId })" class="nav-link">↻ Refresh</a>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+                @if (TempData["ErrorDetails"] != null)
+                {
+                    <br>
+            
+                    <small>@TempData["ErrorDetails"]</small>
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger")">
+                @Model.Message
+            </div>
+        }
+
+        <!-- Upload Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Upload Images</h3>
+                <span class="counter">@Model.ImageCount / @Model.MaxImages</span>
+            </div>
+            <div class="card-body">
+                @if (Model.CanUploadMore)
+                {
+                    <div class="upload-area">
+                        <form asp-action="UploadImages" asp-route-customerId="@Model.CustomerId" method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <p>Choose images to upload</p>
+                            <input type="file" name="files" multiple accept="image/*" class="file-input" required>
+                            <br>
+                            <button type="submit" class="btn">Upload Images</button>
+                            <p class="small-text">JPG, PNG, GIF • Max 5MB each • @(Model.MaxImages - Model.ImageCount) slots remaining</p>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <div class="upload-area disabled">
+                        <div class="alert alert-warning" style="margin: 0;">
+                            <strong>Upload limit reached</strong><br>
+                            You have @Model.MaxImages images. Delete some to upload more.
+                        </div>
+                    </div>
+                }
+
+                <!-- Progress Bar -->
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: @(((double)Model.ImageCount / Model.MaxImages) * 100)%"></div>
+                </div>
+                <p class="small-text">@Model.ImageCount of @Model.MaxImages images used</p>
+            </div>
+        </div>
+
+        <!-- Images Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Images</h3>
+                <span class="counter">@Model.ImageCount images</span>
+            </div>
+            <div class="card-body">
+                @if (Model.Images.Any())
+                {
+                    <div class="images-grid">
+                        @foreach (var image in Model.Images)
+                        {
+                            <div class="image-item">
+                                <img src="https://localhost:5001/api/images/@image.Id/data"
+                                     alt="@image.FileName"
+                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm9yPC90ZXh0Pjwvc3ZnPg=='" />
+                                <div class="image-details">
+                                    <div class="image-name">@image.FileName</div>
+                                    <div class="image-date">@image.UploadedAt.ToString("MMM dd, yyyy")</div>
+                                    <form asp-action="DeleteImage"
+                                          asp-route-customerId="@Model.CustomerId"
+                                          asp-route-imageId="@image.Id"
+                                          asp-route-fileName="@image.FileName"
+                                          method="post"
+                                          style="display: inline;"
+                                          onsubmit="return confirm('Delete @image.FileName?')">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <h4>No images yet</h4>
+                        <p>Upload some images to get started</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</body>
+</html>

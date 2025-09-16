@@ -1,0 +1,298 @@
+﻿@model CustomerImageApp.Web.Models.CustomerViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Customer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+            .header h1 {
+                font-size: 24px;
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            .header p {
+                color: #666;
+                font-size: 14px;
+            }
+
+        .nav-links {
+            margin-top: 15px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            margin: 0 5px;
+        }
+
+            .nav-link:hover {
+                background: #5a6268;
+                text-decoration: none;
+                color: white;
+            }
+
+            .nav-link.primary {
+                background: #007bff;
+            }
+
+                .nav-link.primary:hover {
+                    background: #0056b3;
+                }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+            .form-control:focus {
+                border-color: #007bff;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+            }
+
+            .form-control.is-invalid {
+                border-color: #dc3545;
+            }
+
+            .form-control:disabled {
+                background: #f8f9fa;
+                color: #6c757d;
+            }
+
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+            .btn:hover {
+                background: #0056b3;
+            }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+            .btn-success:hover {
+                background: #218838;
+            }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+            .btn-secondary:hover {
+                background: #5a6268;
+            }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .validation-summary {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+            .validation-summary h4 {
+                margin-bottom: 10px;
+                font-size: 14px;
+            }
+
+            .validation-summary ul {
+                margin: 0;
+                padding-left: 20px;
+            }
+
+            .validation-summary li {
+                font-size: 13px;
+            }
+
+        .customer-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Edit Customer</h1>
+            <p>Update customer information</p>
+            <div class="nav-links">
+                <a href="@Url.Action("List", "Customers")" class="nav-link">← Back to Customers</a>
+                <a href="@Url.Action("Images", "CustomerImages", new { id = Model.Id })" class="nav-link primary">View Images</a>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <!-- Validation Summary -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="validation-summary">
+                <h4>Please correct the following errors:</h4>
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <!-- Customer Info -->
+        <div class="customer-info">
+            <strong>Customer ID:</strong> @Model.Id | <strong>Created:</strong> @Model.CreatedAt.ToString("MMM dd, yyyy 'at' h:mm tt")
+        </div>
+
+        <!-- Form -->
+        <div class="card">
+            <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.CreatedAt)
+
+                <div class="form-group">
+                    <label asp-for="FirstName" class="form-label">First Name *</label>
+                    <input asp-for="FirstName" class="form-control @(ViewData.ModelState["FirstName"]?.Errors.Count > 0 ? "is-invalid" : "")" placeholder="Enter first name" />
+                    <span asp-validation-for="FirstName" class="invalid-feedback"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="LastName" class="form-label">Last Name *</label>
+                    <input asp-for="LastName" class="form-control @(ViewData.ModelState["LastName"]?.Errors.Count > 0 ? "is-invalid" : "")" placeholder="Enter last name" />
+                    <span asp-validation-for="LastName" class="invalid-feedback"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="form-label">Email Address *</label>
+                    <input asp-for="Email" type="email" class="form-control @(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "is-invalid" : "")" placeholder="Enter email address" />
+                    <span asp-validation-for="Email" class="invalid-feedback"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Phone" class="form-label">Phone Number</label>
+                    <input asp-for="Phone" type="tel" class="form-control @(ViewData.ModelState["Phone"]?.Errors.Count > 0 ? "is-invalid" : "")" placeholder="Enter phone number" />
+                    <span asp-validation-for="Phone" class="invalid-feedback"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Company" class="form-label">Company</label>
+                    <input asp-for="Company" class="form-control @(ViewData.ModelState["Company"]?.Errors.Count > 0 ? "is-invalid" : "")" placeholder="Enter company name" />
+                    <span asp-validation-for="Company" class="invalid-feedback"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Company" class="form-label">Company</label>
+                    <input asp-for="Company" class="form-control @(ViewData.ModelState["Company"]?.Errors.Count > 0 ? "is-invalid" : "")" placeholder="Enter company name" />
+                    <span asp-validation-for="Company" class="invalid-feedback"></span>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Update Customer</button>
+                    <a href="@Url.Action("List", "Customers")" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
