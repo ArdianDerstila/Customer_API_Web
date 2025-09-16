@@ -10,6 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@Model.CustomerName - Images</title>
     <link rel="stylesheet" href="~/css/images.css">
+    <link rel="stylesheet" href="~/css/carousel.css">
+
 </head>
 <body>
     <div class="container">
@@ -98,13 +100,52 @@
             <div class="card-body">
                 @if (Model.Images.Any())
                 {
-                    <div class="images-grid">
+                    <!-- View Toggle -->
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="switchView('carousel')">Carousel View</button>
+                        <button class="view-btn" onclick="switchView('grid')">Grid View</button>
+                    </div>
+
+                    <!-- Carousel View -->
+                    <div id="carousel-view" class="carousel-container">
+                        <div class="carousel-wrapper">
+                            <div class="carousel-track" id="carousel-track">
+                                @foreach (var image in Model.Images)
+                                {
+                                    <div class="carousel-slide">
+                                        <img src="@Html.Raw(image.ImageData)"
+                                             alt="@image.FileName"
+                                             onerror="handleImageError(this);" />
+                                        <div class="carousel-info">
+                                            <div class="carousel-filename">@image.FileName</div>
+                                            <div class="carousel-date">@image.UploadedAt.ToString("MMM dd, yyyy")</div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Navigation Buttons -->
+                            <button class="carousel-nav carousel-prev" onclick="prevSlide()">‹</button>
+                            <button class="carousel-nav carousel-next" onclick="nextSlide()">›</button>
+                        </div>
+
+                        <!-- Indicators -->
+                        <div class="carousel-indicators" id="carousel-indicators">
+                            @for (int i = 0; i < Model.Images.Count(); i++)
+                            {
+                                <button class="carousel-indicator @(i == 0 ? "active" : "")" onclick="goToSlide(@i)"></button>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Grid View -->
+                    <div id="grid-view" class="images-grid hidden">
                         @foreach (var image in Model.Images)
                         {
                             <div class="image-item">
-                                <img src="http://ecommerce112-001-site6.qtempurl.com/api/images/@image.Id/data"
+                                <img src="@Html.Raw(image.ImageData)"
                                      alt="@image.FileName"
-                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm9yPC90ZXh0Pjwvc3ZnPg=='" />
+                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI0NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIEVycm9yPC90ZXh0Pjx0ZXh0IHg9IjUwJSIgeT0iNTUlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5DaGVjayBBUEk8L3RleHQ+PC9zdmc+'" />
                                 <div class="image-details">
                                     <div class="image-name">@image.FileName</div>
                                     <div class="image-date">@image.UploadedAt.ToString("MMM dd, yyyy")</div>
@@ -133,5 +174,138 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Image error handling with fallback
+        function handleImageError(img) {
+            if (!img.hasAttribute('data-tried-fallback')) {
+                // First try: use the fallback API URL
+                img.setAttribute('data-tried-fallback', 'true');
+                img.src = img.getAttribute('data-fallback-url');
+            } else {
+                // Second try failed: show error placeholder
+                img.onerror = null;
+                img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI0NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIFVuYXZhaWxhYmxlPC90ZXh0Pjx0ZXh0IHg9IjUwJSIgeT0iNTUlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBOb3QgRm91bmQ8L3RleHQ+PC9zdmc+';
+            }
+        }
+
+        // Carousel functionality
+        let currentSlide = 0;
+        const totalSlides = @Model.Images.Count();
+
+        function updateCarousel() {
+            const track = document.getElementById('carousel-track');
+            const indicators = document.querySelectorAll('.carousel-indicator');
+            const prevBtn = document.querySelector('.carousel-prev');
+            const nextBtn = document.querySelector('.carousel-next');
+
+            if (track) {
+                track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }
+
+            // Update indicators
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentSlide);
+            });
+
+            // Update navigation buttons
+            if (prevBtn) prevBtn.disabled = currentSlide === 0;
+            if (nextBtn) nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateCarousel();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateCarousel();
+            }
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateCarousel();
+        }
+
+        // View switching functionality
+        function switchView(view) {
+            const carouselView = document.getElementById('carousel-view');
+            const gridView = document.getElementById('grid-view');
+            const buttons = document.querySelectorAll('.view-btn');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            if (view === 'carousel') {
+                carouselView.classList.remove('hidden');
+                gridView.classList.add('hidden');
+                buttons[0].classList.add('active');
+            } else {
+                carouselView.classList.add('hidden');
+                gridView.classList.remove('hidden');
+                buttons[1].classList.add('active');
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const carouselView = document.getElementById('carousel-view');
+            if (!carouselView.classList.contains('hidden')) {
+                if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                } else if (e.key === 'ArrowRight') {
+                    nextSlide();
+                }
+            }
+        });
+
+        // Initialize carousel
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCarousel();
+
+            // Auto-play carousel (optional)
+            // setInterval(function() {
+            //     if (currentSlide < totalSlides - 1) {
+            //         nextSlide();
+            //     } else {
+            //         currentSlide = 0;
+            //         updateCarousel();
+            //     }
+            // }, 5000);
+        });
+
+        // Touch/swipe support for mobile
+        let startX = 0;
+        let endX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            endX = e.changedTouches[0].clientX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const carouselView = document.getElementById('carousel-view');
+            if (!carouselView.classList.contains('hidden')) {
+                const swipeThreshold = 50;
+                const swipeDistance = startX - endX;
+
+                if (Math.abs(swipeDistance) > swipeThreshold) {
+                    if (swipeDistance > 0) {
+                        nextSlide(); // Swipe left - next slide
+                    } else {
+                        prevSlide(); // Swipe right - previous slide
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>
